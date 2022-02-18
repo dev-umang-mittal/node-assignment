@@ -1,8 +1,45 @@
 const express = require("express");
 const app = express();
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
+let users = {};
+let userId = 0;
+
+//Returns all the users from the database
+app.get("/allusers", (req, res) => {
+  res.send(users);
 });
 
-app.listen(8080);
+// Creates a new user object into the database
+app.post("/create", middleWare, (req, res) => {
+  users[userId] = req.body;
+  userId += 1;
+  res.sendStatus(201);
+});
+
+// Returns the user specific to passed ID.
+app.get("/user/:id", (req, res) => {
+  res.send(users?.[req.params.id] || "No User is found with this id.");
+});
+
+// Edits the user specific to the passed ID.
+app.put("/user/:id", middleWare, (req, res) => {
+  users[req.params.id] = req.body;
+  res.sendStatus(200);
+});
+
+// Deletes a user specific to the passed ID.
+app.delete("/user/:id", middleWare, (req, res) => {
+  delete users[req.params.id];
+  res.sendStatus(200);
+});
+
+function middleWare(req, res, next) {
+  console.log(users);
+  next();
+}
+
+app.listen(8080, () => {
+  console.log("Server is running...");
+});
