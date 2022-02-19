@@ -13,7 +13,10 @@ An Express based NodeJS server that responds to the user signup and signin reque
 ### To get all users [GET]
 
 > /allusers
-> Response
+
+###
+
+Response
 
 ```json
 [
@@ -35,7 +38,10 @@ An Express based NodeJS server that responds to the user signup and signin reque
 ### To get a user with a specific id [GET]
 
 > /user/0 {0 is the id}
-> Response
+
+###
+
+Response
 
 ```json
 {
@@ -49,7 +55,10 @@ An Express based NodeJS server that responds to the user signup and signin reque
 ### To create a user [POST]
 
 > /user
-> Body to be sent
+
+###
+
+Body to be sent
 
 ```json
 {
@@ -62,13 +71,17 @@ An Express based NodeJS server that responds to the user signup and signin reque
 ### Edit the details of a user [PUT]
 
 > /user/0 {0 is the id}
-> Body to be sent
+
+###
+
+Body to be sent
 
 ```json
 {
-  "username": "ABCD",
-  "email": "abcd@email.com",
-  "Only the Fields": "To be changed"
+  "edit": {
+    "username": "ABCD",
+    "Only the Fields": "To be changed"
+  }
 }
 ```
 
@@ -79,7 +92,10 @@ An Express based NodeJS server that responds to the user signup and signin reque
 ### Login [POST]
 
 > login/
-> Body to be sent
+
+###
+
+Body to be sent
 
 ```json
 {
