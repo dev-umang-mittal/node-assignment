@@ -11,7 +11,7 @@ app.get("/allusers", (req, res) => {
 });
 
 // Creates a new user object into the database
-app.post("/create", middleWare, (req, res) => {
+app.post("/create", logger, (req, res) => {
   users.push(req.body);
   res.sendStatus(201);
 });
@@ -22,22 +22,33 @@ app.get("/user/:id", (req, res) => {
 });
 
 // Edits the user specific to the passed ID.
-app.put("/user/:id", middleWare, (req, res) => {
+app.put("/user/:id", logger, (req, res) => {
   users[req.params.id] = req.body;
   res.sendStatus(200);
 });
 
 // Deletes a user specific to the passed ID.
-app.delete("/user/:id", middleWare, (req, res) => {
+app.delete("/user/:id", logger, (req, res) => {
   users.splice(req.params.id, 1);
   res.sendStatus(200);
 });
 
-app.post("/login", middleWare, (req, res) => {
+//Autenticating a user based on email and password
+app.post("/login", authenticate, (req, res) => {
   res.sendStatus(200);
 });
 
-function middleWare(req, res, next) {
+// Authenticate Middle ware function [with user credentials]
+function authenticate(req, res, next) {
+  let arr = users.filter((user) => {
+    if (user.email === req.body.email && user.password === req.body.password)
+      return true;
+    return false;
+  });
+  arr.length ? next() : res.sendStatus(403);
+}
+
+function logger(req, res, next) {
   console.log(users);
   next();
 }
