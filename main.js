@@ -45,7 +45,7 @@ function authenticate(req, res, next) {
       return true;
     return false;
   });
-  arr.length ? next() : res.sendStatus(403);
+  arr.length ? next() : res.sendStatus(400);
 }
 
 function logger(req, res, next) {
