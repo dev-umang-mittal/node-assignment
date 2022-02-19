@@ -3,8 +3,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-let users = {};
-let userId = 0;
+let users = [];
 
 //Returns all the users from the database
 app.get("/allusers", (req, res) => {
@@ -13,8 +12,7 @@ app.get("/allusers", (req, res) => {
 
 // Creates a new user object into the database
 app.post("/create", middleWare, (req, res) => {
-  users[userId] = req.body;
-  userId += 1;
+  users.push(req.body);
   res.sendStatus(201);
 });
 
@@ -31,7 +29,11 @@ app.put("/user/:id", middleWare, (req, res) => {
 
 // Deletes a user specific to the passed ID.
 app.delete("/user/:id", middleWare, (req, res) => {
-  delete users[req.params.id];
+  users.splice(req.params.id, 1);
+  res.sendStatus(200);
+});
+
+app.post("/login", middleWare, (req, res) => {
   res.sendStatus(200);
 });
 
