@@ -1,6 +1,4 @@
 const express = require("express");
-const req = require("express/lib/request");
-const { sendStatus } = require("express/lib/response");
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -21,7 +19,7 @@ app.get("/allusers", (req, res) => {
 });
 
 // Creates a new user object into the database
-app.post("/create", logger, (req, res) => {
+app.post("/create", (req, res) => {
   req.body.id = userId++;
   users.push(req.body);
   res.sendStatus(201);
