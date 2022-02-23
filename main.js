@@ -23,7 +23,7 @@ app.get("/allusers", (req, res) => {
 app.post("/create", (req, res) => {
   req.body.id = userId++;
   users.push(req.body);
-  res.send({ status: "User Created Successfully." });
+  res.send({ code: 201, status: "User Created Successfully." });
 });
 
 // Returns the user specific to passed ID.
@@ -34,18 +34,18 @@ app.get("/user/:id", getUserIndex, (req, res) => {
 // Edits the specific user with the passed ID.
 app.put("/user/:id", getUserIndex, (req, res) => {
   users[req.body.arrIndex] = { ...req.body.user, ...req.body.edit };
-  res.send({ status: "User Edited Successfully" });
+  res.send({ code: 202, status: "User Edited Successfully" });
 });
 
 // Deletes a user specific to the passed ID.
 app.delete("/user/:id", getUserIndex, (req, res) => {
   users.splice(req.body.arrIndex, 1);
-  res.send({ status: "User Deleted Successfully" });
+  res.send({ code: 202, status: "User Deleted Successfully" });
 });
 
 //Autenticating a user based on email and password
 app.post("/login", authenticate, (req, res) => {
-  res.send({ status: "User LoggedIn Successfully" });
+  res.send({ code: 200, status: "User LoggedIn Successfully" });
 });
 
 function getUserIndex(req, res, next) {
