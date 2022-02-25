@@ -33,7 +33,7 @@ app.get("/allusers", async (req, res) => {
     console.log(e);
   } finally {
     resp ? (code = 200) : (code = 400);
-    res.status(code).json(resp);
+    res.status(code).json({ code, response: resp });
   }
 });
 
@@ -46,7 +46,7 @@ app.post("/create", async (req, res) => {
     console.log(e);
   } finally {
     resp ? (code = 200) : (code = 400);
-    res.status(code).json(resp);
+    res.status(code).json({ code, response: resp });
   }
 });
 
@@ -62,7 +62,7 @@ app.get("/user/:id", async (req, res) => {
     console.log(e);
   }
   resp ? (code = 200) : (code = 400);
-  res.status(code).json(resp);
+  res.status(code).json({ code, response: resp });
 });
 
 // Edits the specific user with the passed ID.
@@ -77,7 +77,7 @@ app.put("/user/:id", async (req, res) => {
     console.log(e);
   } finally {
     resp.matchedCount > 0 ? (code = 200) : (code = 400);
-    res.sendStatus(code);
+    res.status(code).json({ code });
   }
 });
 
@@ -92,8 +92,8 @@ app.delete("/user/:id", async (req, res) => {
   } catch (e) {
     console.log(e);
   } finally {
-    resp.deletedCount > 0 ? (code = 202) : (code = 400);
-    res.sendStatus(code);
+    resp.deletedCount > 0 ? (code = 200) : (code = 400);
+    res.status(code).json({ code });
   }
 });
 
@@ -109,7 +109,7 @@ app.post("/login", async (req, res) => {
     console.log(e);
   } finally {
     resp ? (code = 200) : (code = 400);
-    res.status(code).json(resp);
+    res.status(code).json({ code, response: resp });
   }
 });
 
