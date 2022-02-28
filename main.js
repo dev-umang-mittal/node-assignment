@@ -1,26 +1,20 @@
-const { MongoClient, ObjectId } = require("mongodb");
-const uri = "mongodb://127.0.0.1:27017";
-const client = new MongoClient(uri);
+const mongoose = require("mongoose");
 const express = require("express");
 const app = express();
 const cors = require("cors");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors({ origin: "*" }));
+const userSchema = require("./userModel");
 
-let connection;
+mongoose.connect("mongodb://localhost/users");
+let db = mongoose.connection;
 
-async function connectToDb() {
-  try {
-    connection = await client.connect();
-  } catch (e) {
-    console.log(e);
-  }
-}
+db.on("error", (error) => {
+  console.log(error);
+});
 
-connectToDb();
-
-client.on("open", () => {
+db.once("open", () => {
   console.log("Connected");
 });
 
@@ -28,7 +22,7 @@ client.on("open", () => {
 app.get("/allusers", async (req, res) => {
   let resp, code;
   try {
-    resp = await connection.db("users").collection("users").find({}).toArray();
+    resp = await userSchema.find();
   } catch (e) {
     console.log(e);
   } finally {
@@ -40,8 +34,13 @@ app.get("/allusers", async (req, res) => {
 // Creates a new user object into the database
 app.post("/create", async (req, res) => {
   let resp, code;
+  const user = new userSchema({
+    username: req.body.username,
+    email: req.body.email,
+    password: req.body.password,
+  });
   try {
-    resp = await connection.db("users").collection("users").insertOne(req.body);
+    resp = await user.save();
   } catch (e) {
     console.log(e);
   } finally {
@@ -54,10 +53,7 @@ app.post("/create", async (req, res) => {
 app.get("/user/:id", async (req, res) => {
   let resp, code;
   try {
-    resp = await connection
-      .db("users")
-      .collection("users")
-      .findOne({ _id: new ObjectId(req.params.id) });
+    resp = await userSchema.findById(req.params.id);
   } catch (e) {
     console.log(e);
   }
@@ -69,14 +65,11 @@ app.get("/user/:id", async (req, res) => {
 app.put("/user/:id", async (req, res) => {
   let resp, code;
   try {
-    resp = await connection
-      .db("users")
-      .collection("users")
-      .updateOne({ _id: ObjectId(req.params.id) }, { $set: req.body });
+    resp = await userSchema.findOneAndUpdate({ _id: req.params.id }, req.body);
   } catch (e) {
     console.log(e);
   } finally {
-    resp.matchedCount > 0 ? (code = 200) : (code = 400);
+    resp ? (code = 200) : (code = 400);
     res.status(code).json({ code });
   }
 });
@@ -85,14 +78,12 @@ app.put("/user/:id", async (req, res) => {
 app.delete("/user/:id", async (req, res) => {
   let resp, code;
   try {
-    resp = await connection
-      .db("users")
-      .collection("users")
-      .deleteOne({ _id: ObjectId(req.params.id) });
+    resp = await userSchema.findOneAndDelete({ _id: req.params.id });
   } catch (e) {
     console.log(e);
   } finally {
-    resp.deletedCount > 0 ? (code = 200) : (code = 400);
+    console.log(resp);
+    resp ? (code = 200) : (code = 400);
     res.status(code).json({ code });
   }
 });
@@ -101,10 +92,10 @@ app.delete("/user/:id", async (req, res) => {
 app.post("/login", async (req, res) => {
   let resp, code;
   try {
-    resp = await connection
-      .db("users")
-      .collection("users")
-      .findOne({ email: req.body.email, password: req.body.password });
+    resp = await userSchema.findOne({
+      email: req.body.email,
+      password: req.body.password,
+    });
   } catch (e) {
     console.log(e);
   } finally {

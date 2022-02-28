@@ -1,10 +1,12 @@
 {
   "scripts": {
-    "start": "node main.js"
+    "start": "nodemon main.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.17.3",
-    "mongodb": "^4.4.0"
+    "mongodb": "^4.4.0",
+    "mongoose": "^6.2.3",
+    "nodemon": "^2.0.15"
   }
 }
