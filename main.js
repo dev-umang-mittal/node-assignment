@@ -51,56 +51,49 @@ app.post("/create", async (req, res) => {
 
 // Returns the user specific to passed ID.
 app.get("/user/:id", async (req, res) => {
-  let resp, code;
   try {
-    resp = await userSchema.findById(req.params.id);
+    let resp = await userSchema.findById(req.params.id);
+    res.status(200).json({ 200, response: resp });
   } catch (e) {
+    res.status(200).json({ 200, response: resp });
     console.log(e);
   }
   resp ? (code = 200) : (code = 400);
-  res.status(code).json({ code, response: resp });
 });
 
 // Edits the specific user with the passed ID.
 app.put("/user/:id", async (req, res) => {
-  let resp, code;
   try {
-    resp = await userSchema.findOneAndUpdate({ _id: req.params.id }, req.body);
+    let resp = await userSchema.findOneAndUpdate({ _id: req.params.id }, req.body);
+    res.status(200).json({ code:200,response:resp });
   } catch (e) {
     console.log(e);
-  } finally {
-    resp ? (code = 200) : (code = 400);
-    res.status(code).json({ code });
+    res.status(400).json({ code:400,response:e.message });
   }
 });
 
 // Deletes a user specific to the passed ID.
 app.delete("/user/:id", async (req, res) => {
-  let resp, code;
   try {
-    resp = await userSchema.findOneAndDelete({ _id: req.params.id });
+    let resp = await userSchema.findOneAndDelete({ _id: req.params.id });
+    res.status(code).json({ code });
   } catch (e) {
     console.log(e);
-  } finally {
-    console.log(resp);
-    resp ? (code = 200) : (code = 400);
-    res.status(code).json({ code });
+    res.status(404).json({ code: 404, response: e.message });
   }
 });
 
 //Autenticating a user based on email and password
 app.post("/login", async (req, res) => {
-  let resp, code;
   try {
-    resp = await userSchema.findOne({
+    let resp = await userSchema.findOne({
       email: req.body.email,
       password: req.body.password,
     });
+    res.status(200).json({ code: 200, response: resp });
   } catch (e) {
     console.log(e);
-  } finally {
-    resp ? (code = 200) : (code = 400);
-    res.status(code).json({ code, response: resp });
+    res.status(200).json({ code: 200, response: e.message });
   }
 });
 
