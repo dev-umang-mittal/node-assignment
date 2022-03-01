@@ -18,7 +18,6 @@ db.once("open", () => {
   console.log("Connected");
 });
 
-
 /*
 => USER ROUTES
 */
@@ -189,21 +188,69 @@ app.put("/editblog/:blogId", async (req, res) => {
 */
 
 //Create a comment
-app.post("/createcomment", async(req,res)=>{
-  let resp,code;
-  resp = new commentModel({
-    
-  })
-  try{
-  }
-})
-
-app.get("/comments/:id", async (req,res){
+app.post("/createcomment", async (req, res) => {
   let resp, code;
-  try{
-    resp = await 
+  const comment = new commentModel({
+    commentedOnId: req.body.commentedOnId,
+    commentText: req.body.commentText,
+    commenter: req.body.commenter,
+  });
+  try {
+    resp = comment.save();
+  } catch (e) {
+    console.log(e);
+  } finally {
+    resp ? (code = 200) : (code = 400);
+    res.status(code).json(resp);
   }
-})
+});
+
+//Get all comments by an Id
+app.get("/comments/:id", async (req, res) => {
+  let resp, code;
+  try {
+    resp = await commentModel.find({ commentedOnId: req.params.id });
+  } catch (e) {
+    console.log(e);
+  } finally {
+    resp ? (code = 200) : (code = 400);
+    res.status(code).json(resp);
+  }
+});
+
+//Delete a comment [only if the loggedIn user is the commenter]
+app.delete("/deletecomment/:commentId", async (req, res) => {
+  let resp, code;
+  try {
+    resp = commentModel.deleteOne({ _id: req.params.commentId });
+  } catch (e) {
+    console.log(e);
+  } finally {
+    resp ? (code = 200) : (code = 400);
+    res.status(code).json(resp);
+  }
+});
+
+/*
+Miscellaneous Routes
+*/
+//Serch route to search the blogs.
+app.get("/search/:term", async (req, res) => {
+  let resp, code;
+  try {
+    resp = await blogModel.aggregate().search({
+      text: {
+        query: req.params.term,
+        path: "title",
+      },
+    });
+  } catch (e) {
+    console.log(e);
+  } finally {
+    resp ? (code = 200) : (code = 400);
+    res.status(code).json({ code, response: resp });
+  }
+});
 
 app.listen(8080, () => {
   console.info("Server is running...");

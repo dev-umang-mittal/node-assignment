@@ -90,6 +90,7 @@ const blogSchema = new mongoose.Schema({
     required: true,
   },
   comments: [commentSchema],
+  tags: [String],
 });
 
 const userModel = mongoose.model("userSchema", userSchema);
