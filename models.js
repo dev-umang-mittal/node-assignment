@@ -94,5 +94,6 @@ const blogSchema = new mongoose.Schema({
 
 const userModel = mongoose.model("userSchema", userSchema);
 const blogModel = mongoose.model("blogModel", blogSchema);
+const commentModel = mongoose.model("commentModel", commentSchema);
 
-module.exports = { userModel, blogModel };
+module.exports = { userModel, blogModel, commentModel };

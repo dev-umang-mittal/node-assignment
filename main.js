@@ -5,7 +5,7 @@ const cors = require("cors");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors({ origin: "*" }));
-const { userModel, blogModel } = require("./models");
+const { userModel, blogModel, commentModel } = require("./models");
 
 mongoose.connect("mongodb://localhost/users");
 let db = mongoose.connection;
@@ -18,6 +18,10 @@ db.once("open", () => {
   console.log("Connected");
 });
 
+
+/*
+=> USER ROUTES
+*/
 //Returns all the users from the database
 app.get("/allusers", async (req, res) => {
   let resp, code;
@@ -103,6 +107,9 @@ app.post("/login", async (req, res) => {
   }
 });
 
+/*
+=> Blogs ROUTES
+*/
 //Get All blogs created by an author
 app.get("/blogs/:authorId", async (req, res) => {
   let resp, code;
@@ -176,6 +183,27 @@ app.put("/editblog/:blogId", async (req, res) => {
     res.status(code).send(resp);
   }
 });
+
+/*
+=> COMMENTS ROUTES
+*/
+
+//Create a comment
+app.post("/createcomment", async(req,res)=>{
+  let resp,code;
+  resp = new commentModel({
+    
+  })
+  try{
+  }
+})
+
+app.get("/comments/:id", async (req,res){
+  let resp, code;
+  try{
+    resp = await 
+  }
+})
 
 app.listen(8080, () => {
   console.info("Server is running...");
