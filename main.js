@@ -103,10 +103,11 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("allblogs/:authorId", async (req, res) => {
+//Get All blogs created by an author
+app.get("/blogs/:authorId", async (req, res) => {
   let resp, code;
   try {
-    resp = await blogModel.find({ "authorDetails.id": req.params.id });
+    resp = await blogModel.find({ "authorDetails.id": req.params.authorId });
   } catch (e) {
     console.log(e);
   } finally {
@@ -115,6 +116,20 @@ app.get("allblogs/:authorId", async (req, res) => {
   }
 });
 
+//Get a blog by a specific Id
+app.get("/blog/:blogId", async (req, res) => {
+  let resp, code;
+  try {
+    resp = await blogModel.findOne({ _id: req.params.blogId });
+  } catch (e) {
+    console.log(e);
+  } finally {
+    resp ? (code = 200) : (code = 400);
+    res.status(code).json({ code, response: resp });
+  }
+});
+
+//Create a Blog
 app.post("/createblog", async (req, res) => {
   let resp, code;
   const blog = new blogModel({
@@ -133,7 +148,34 @@ app.post("/createblog", async (req, res) => {
   }
 });
 
-// TODO: Authenticate Middleware function [with user credentials]
+//Delete a Blog [only if the current loggedIn user is the author]
+app.delete("/deleteblog/:blogId", async (req, res) => {
+  let resp, code;
+  try {
+    resp = await blogModel.deleteOne({ _id: req.params.blogId });
+  } catch (e) {
+    console.log(e);
+  } finally {
+    resp ? (code = 200) : (code = 400);
+    res.status(code).send(resp);
+  }
+});
+
+//Edits a Blog [Only if the current loggedIn user is the author]
+app.put("/editblog/:blogId", async (req, res) => {
+  let resp, code;
+  try {
+    resp = await blogModel.findOneAndUpdate(
+      { _id: req.params.blogId },
+      req.body
+    );
+  } catch (e) {
+    console.log(e);
+  } finally {
+    resp ? (code = 200) : (code = 400);
+    res.status(code).send(resp);
+  }
+});
 
 app.listen(8080, () => {
   console.info("Server is running...");
