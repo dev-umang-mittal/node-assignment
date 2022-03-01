@@ -5,7 +5,7 @@ const cors = require("cors");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors({ origin: "*" }));
-const userSchema = require("./userModel");
+const { userModel, blogModel } = require("./models");
 
 mongoose.connect("mongodb://localhost/users");
 let db = mongoose.connection;
@@ -22,7 +22,7 @@ db.once("open", () => {
 app.get("/allusers", async (req, res) => {
   let resp, code;
   try {
-    resp = await userSchema.find();
+    resp = await userModel.find();
   } catch (e) {
     console.log(e);
   } finally {
@@ -34,7 +34,7 @@ app.get("/allusers", async (req, res) => {
 // Creates a new user object into the database
 app.post("/create", async (req, res) => {
   let resp, code;
-  const user = new userSchema({
+  const user = new userModel({
     username: req.body.username,
     email: req.body.email,
     password: req.body.password,
@@ -53,7 +53,7 @@ app.post("/create", async (req, res) => {
 app.get("/user/:id", async (req, res) => {
   let resp, code;
   try {
-    resp = await userSchema.findById(req.params.id);
+    resp = await userModel.findById(req.params.id);
   } catch (e) {
     console.log(e);
   }
@@ -65,7 +65,7 @@ app.get("/user/:id", async (req, res) => {
 app.put("/user/:id", async (req, res) => {
   let resp, code;
   try {
-    resp = await userSchema.findOneAndUpdate({ _id: req.params.id }, req.body);
+    resp = await userModel.findOneAndUpdate({ _id: req.params.id }, req.body);
   } catch (e) {
     console.log(e);
   } finally {
@@ -78,7 +78,7 @@ app.put("/user/:id", async (req, res) => {
 app.delete("/user/:id", async (req, res) => {
   let resp, code;
   try {
-    resp = await userSchema.findOneAndDelete({ _id: req.params.id });
+    resp = await userModel.findOneAndDelete({ _id: req.params.id });
   } catch (e) {
     console.log(e);
   } finally {
@@ -91,10 +91,40 @@ app.delete("/user/:id", async (req, res) => {
 app.post("/login", async (req, res) => {
   let resp, code;
   try {
-    resp = await userSchema.findOne({
+    resp = await userModel.findOne({
       email: req.body.email,
       password: req.body.password,
     });
+  } catch (e) {
+    console.log(e);
+  } finally {
+    resp ? (code = 200) : (code = 400);
+    res.status(code).json({ code, response: resp });
+  }
+});
+
+app.get("allblogs/:authorId", async (req, res) => {
+  let resp, code;
+  try {
+    resp = await blogModel.find({ "authorDetails.id": req.params.id });
+  } catch (e) {
+    console.log(e);
+  } finally {
+    resp ? (code = 200) : (code = 400);
+    res.status(code).json({ code, response: resp });
+  }
+});
+
+app.post("/createblog", async (req, res) => {
+  let resp, code;
+  const blog = new blogModel({
+    title: req.body.title,
+    components: req.body.components,
+    authorDetails: req.body.authorDetails,
+    comments: req.body.comments,
+  });
+  try {
+    resp = await blog.save();
   } catch (e) {
     console.log(e);
   } finally {
