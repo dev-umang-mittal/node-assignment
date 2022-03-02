@@ -1,9 +1,15 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
-    required: true,
+    required: [true, "Username is required."],
+    unique: [true, "This username is unavailable."],
+    validate: [
+      validator.isAlphanumeric,
+      "Usernames may only have letters and numbers.",
+    ],
   },
   image: {
     type: String,
@@ -14,12 +20,14 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: true,
-    unique: true,
+    required: [true, "Email is required."],
+    unique: [true, "Email is already registered."],
+    validate: [validator.isEmail, "Enter a valid email address."],
   },
   password: {
     type: String,
-    required: true,
+    required: [true, "Enter Valid Password."],
+    minLength: [6, "Password should be at least six characters"],
   },
 });
 
@@ -108,7 +116,8 @@ const blogSchema = new mongoose.Schema({
   },
 });
 
-// blogSchema.index({title:'text', })
+blogSchema.index({ title: "text", tags: "text" });
+userSchema.index({ username: "text" });
 
 const userModel = mongoose.model("userSchema", userSchema);
 const blogModel = mongoose.model("blogModel", blogSchema);

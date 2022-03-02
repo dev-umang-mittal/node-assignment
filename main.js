@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const errorHandler = require("./errorHandler");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors({ origin: "*" }));
@@ -35,7 +36,7 @@ app.get("/allusers", async (req, res) => {
 });
 
 // Creates a new user object into the database
-app.post("/create", async (req, res) => {
+app.post("/create", async (req, res, next) => {
   let resp, code;
   const user = new userModel({
     username: req.body.username,
@@ -46,9 +47,10 @@ app.post("/create", async (req, res) => {
     resp = await user.save();
   } catch (e) {
     console.log(e);
-  } finally {
-    resp ? (code = 200) : (code = 400);
-    res.status(code).json({ code, response: resp });
+    next(e);
+    // } finally {
+    //   resp ? (code = 200) : (code = 400);
+    //   res.status(code).json({ code, response: resp });
   }
 });
 
@@ -239,12 +241,7 @@ Miscellaneous Routes
 app.get("/search/:term", async (req, res) => {
   let resp, code;
   try {
-    resp = await blogModel.aggregate().search({
-      text: {
-        query: req.params.term,
-        path: "title",
-      },
-    });
+    resp = await blogModel.find({ $text: { $search: req.params.term } });
   } catch (e) {
     console.log(e);
   } finally {
@@ -252,6 +249,8 @@ app.get("/search/:term", async (req, res) => {
     res.status(code).json({ code, response: resp });
   }
 });
+
+app.use(errorHandler);
 
 app.listen(8080, () => {
   console.info("Server is running...");
