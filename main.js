@@ -143,6 +143,7 @@ app.post("/createblog", async (req, res) => {
     components: req.body.components,
     authorDetails: req.body.authorDetails,
     comments: req.body.comments,
+    tags: req.body.tags,
   });
   try {
     resp = await blog.save();

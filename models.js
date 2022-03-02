@@ -5,6 +5,13 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  image: {
+    type: String,
+  },
+  bio: {
+    type: String,
+    default: "Check out my blogs.",
+  },
   email: {
     type: String,
     required: true,
@@ -16,20 +23,23 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-const blogComponentSchema = new mongoose.Schema({
-  type: {
-    type: String,
-    required: true,
-    lowercase: true,
+const blogComponentSchema = new mongoose.Schema(
+  {
+    type: {
+      type: String,
+      required: true,
+      lowercase: true,
+    },
+    value: {
+      type: String,
+      required: true,
+    },
   },
-  value: {
-    type: String,
-    required: true,
-  },
-});
+  { _id: false }
+);
 
 const PersonDetailsSchema = mongoose.Schema({
-  id: {
+  _id: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
@@ -43,16 +53,19 @@ const PersonDetailsSchema = mongoose.Schema({
   },
 });
 
-const commentdMetadata = mongoose.Schema({
-  date: {
-    type: Date,
-    default: new Date(),
+const commentdMetadata = mongoose.Schema(
+  {
+    date: {
+      type: Date,
+      default: new Date(),
+    },
+    upvotes: {
+      type: Number,
+      default: 0,
+    },
   },
-  upvotes: {
-    type: Number,
-    default: 0,
-  },
-});
+  { _id: false }
+);
 
 const commentSchema = mongoose.Schema({
   commentedOnId: {
@@ -68,9 +81,7 @@ const commentSchema = mongoose.Schema({
     type: PersonDetailsSchema,
     required: true,
   },
-  meta: {
-    type: commentdMetadata,
-  },
+  meta: commentdMetadata,
 });
 
 const blogSchema = new mongoose.Schema({
@@ -91,7 +102,13 @@ const blogSchema = new mongoose.Schema({
   },
   comments: [commentSchema],
   tags: [String],
+  date: {
+    type: Date,
+    default: new Date(),
+  },
 });
+
+// blogSchema.index({title:'text', })
 
 const userModel = mongoose.model("userSchema", userSchema);
 const blogModel = mongoose.model("blogModel", blogSchema);
