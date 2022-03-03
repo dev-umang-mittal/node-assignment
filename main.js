@@ -23,7 +23,7 @@ db.once("open", () => {
 => USER ROUTES
 */
 //Returns all the users from the database
-app.get("/allusers", async (req, res) => {
+app.get("/user/all", async (req, res) => {
   try {
     const response = await userModel.find();
     res.json(response);
@@ -33,7 +33,8 @@ app.get("/allusers", async (req, res) => {
 });
 
 // Creates a new user object into the database
-app.post("/create", async (req, res, next) => {
+app.post("/user/create", async (req, res, next) => {
+  console.log(req);
   const user = new userModel({
     username: req.body.username,
     email: req.body.email,
@@ -120,12 +121,11 @@ app.get("/blog/:blogId", async (req, res, next) => {
 });
 
 //Create a Blog
-app.post("/createblog", async (req, res, next) => {
+app.post("/blog/create", async (req, res, next) => {
   const blog = new blogModel({
     title: req.body.title,
     components: req.body.components,
     authorDetails: req.body.authorDetails,
-    comments: req.body.comments,
     tags: req.body.tags,
   });
   try {
@@ -137,7 +137,7 @@ app.post("/createblog", async (req, res, next) => {
 });
 
 //Delete a Blog [only if the current loggedIn user is the author]
-app.delete("/deleteblog/:blogId", async (req, res, next) => {
+app.delete("/blog/delete/:blogId", async (req, res, next) => {
   try {
     const response = await blogModel.deleteOne({ _id: req.params.blogId });
     res.json(response);
@@ -147,11 +147,24 @@ app.delete("/deleteblog/:blogId", async (req, res, next) => {
 });
 
 //Edits a Blog [Only if the current loggedIn user is the author]
-app.put("/editblog/:blogId", async (req, res, next) => {
+app.put("/blog/edit/:blogId", async (req, res, next) => {
   try {
     const response = await blogModel.findOneAndUpdate(
       { _id: req.params.blogId },
       req.body
+    );
+    res.json(response);
+  } catch (e) {
+    next(e);
+  }
+});
+
+// Like a blog [Only logged In user]
+app.get("/blog/like/:id", async (req, res, next) => {
+  try {
+    const response = await blogModel.findOneAndUpdate(
+      { _id: req.params.id },
+      { $inc: { likes: 1 } }
     );
     res.json(response);
   } catch (e) {
@@ -164,7 +177,7 @@ app.put("/editblog/:blogId", async (req, res, next) => {
 */
 
 //Create a comment
-app.post("/createcomment", async (req, res, next) => {
+app.post("/comment/create", async (req, res, next) => {
   const comment = new commentModel({
     commentedOnId: req.body.commentedOnId,
     commentText: req.body.commentText,
@@ -179,7 +192,7 @@ app.post("/createcomment", async (req, res, next) => {
 });
 
 //Get all comments by an Id
-app.get("/comments/:id", async (req, res, next) => {
+app.get("/comment/:id", async (req, res, next) => {
   try {
     const response = await commentModel.find({ commentedOnId: req.params.id });
     res.json(response);
@@ -188,10 +201,25 @@ app.get("/comments/:id", async (req, res, next) => {
   }
 });
 
-//Delete a comment [only if the loggedIn user is the commenter]
-app.delete("/deletecomment/:commentId", async (req, res, next) => {
+// Upvote a comment [Only if the user is loggedIn]
+app.get("/comment/upvote/:commentId", async (req, res, next) => {
   try {
-    const response = commentModel.deleteOne({ _id: req.params.commentId });
+    const response = await commentModel.findOneAndUpdate(
+      { _id: req.params.commentId },
+      { $inc: { "meta.upvotes": 1 } }
+    );
+    res.json(response);
+  } catch (e) {
+    next(e);
+  }
+});
+
+//Delete a comment [only if the loggedIn user is the commenter]
+app.delete("/comment/:commentId", async (req, res, next) => {
+  try {
+    const response = await commentModel.deleteOne({
+      _id: req.params.commentId,
+    });
     res.json(response);
   } catch (e) {
     next(e);

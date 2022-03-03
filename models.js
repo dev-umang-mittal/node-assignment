@@ -89,7 +89,13 @@ const commentSchema = mongoose.Schema({
     type: PersonDetailsSchema,
     required: true,
   },
-  meta: commentdMetadata,
+  meta: {
+    type: commentdMetadata,
+    default: {
+      date: new Date(),
+      upvotes: 0,
+    },
+  },
 });
 
 const blogSchema = new mongoose.Schema({
@@ -108,7 +114,6 @@ const blogSchema = new mongoose.Schema({
     type: PersonDetailsSchema,
     required: true,
   },
-  comments: [commentSchema],
   tags: [String],
   date: {
     type: Date,
@@ -119,8 +124,8 @@ const blogSchema = new mongoose.Schema({
 blogSchema.index({ title: "text", tags: "text" });
 userSchema.index({ username: "text" });
 
-const userModel = mongoose.model("userSchema", userSchema);
-const blogModel = mongoose.model("blogModel", blogSchema);
-const commentModel = mongoose.model("commentModel", commentSchema);
+const userModel = mongoose.model("users", userSchema);
+const blogModel = mongoose.model("blogs", blogSchema);
+const commentModel = mongoose.model("comments", commentSchema);
 
 module.exports = { userModel, blogModel, commentModel };
