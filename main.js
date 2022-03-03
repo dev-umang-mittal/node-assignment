@@ -44,7 +44,6 @@ app.post("/user/create", async (req, res, next) => {
     const response = await user.save();
     res.json(response);
   } catch (e) {
-    console.log(e);
     next(e);
   }
 });
